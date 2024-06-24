@@ -1,0 +1,140 @@
+title,domain,category
+Word Processors,Productivity Tools,Productivity Tools
+Spreadsheets,Productivity Tools,Productivity Tools
+Presentations,Productivity Tools,Productivity Tools
+Others,Productivity Tools,Productivity Tools
+Google Meet,Meeting & Webinar Platforms,Communication Tools
+Others,Meeting & Webinar Platforms,Communication Tools
+Slack,Chat & Instant Messaging,Communication Tools
+Whatsapp,Chat & Instant Messaging,Communication Tools
+Discord,Chat & Instant Messaging,Communication Tools
+Microsoft Teams Chat,Chat & Instant Messaging,Communication Tools
+Others,Chat & Instant Messaging,Communication Tools
+Outlook,Email Platforms,Communication Tools
+Gmail,Email Platforms,Communication Tools
+Google Business Mail,Email Platforms,Communication Tools
+Yahoo Mail,Email Platforms,Communication Tools
+Others,Email Platforms,Communication Tools
+Trello,Collaboration & Project Management,Collaboration & Project Management
+Asana,Collaboration & Project Management,Collaboration & Project Management
+Monday,Collaboration & Project Management,Collaboration & Project Management
+JIRA,Collaboration & Project Management,Collaboration & Project Management
+Others,Collaboration & Project Management,Collaboration & Project Management
+Microsoft Office Online,Collaboration & Project Management,Collaboration & Project Management
+Notion,Collaboration & Project Management,Collaboration & Project Management
+Confluence,Collaboration & Project Management,Collaboration & Project Management
+Others,Collaboration & Project Management,Collaboration & Project Management
+IDEs & Code Editors,Development,Development
+Visual Studio Code Editors,Development,Productive Tools
+Database Management,Development,Development
+Version Control Platforms,Development,Development
+GitHub,Development,Development
+GitLab,Development,Development
+Bitbucket,Development,Development
+Others,Development,Development
+CI/CD Tools,Development,Development
+Adobe Creative Cloud,Design & Graphics,Design & Graphics
+Figma,Design & Graphics,Design & Graphics
+Canva,Design & Graphics,Design & Graphics
+Others,Design & Graphics,Design & Graphics
+Research Publications & Journals,Research & Learning,Research & Learning
+Online Courses & Platforms,Coursera,Research & Learning
+Online Courses & Platforms,Udemy,Research & Learning
+Online Courses & Platforms,Khan Academy,Research & Learning
+Online Courses & Platforms,Others,Research & Learning
+Knowledge-sharing & Forums,Stack Exchange,Research & Learning
+Knowledge-sharing & Forums,Reddit Professional Discussions,Research & Learning
+Knowledge-sharing & Forums,Quora Professional Discussions,Research & Learning
+Knowledge-sharing & Forums,Quora Personal Discussions,Research & Learning
+Knowledge-sharing & Forums,Reddit Personal Discussions,Research & Learning
+Knowledge-sharing & Forums,Others,Research & Learning
+National News,News & Information,News & Information
+International News,News & Information,News & Information
+Industry-specific Publications,News & Information,News & Information
+Others,News & Information,News & Information
+Professional Networking,LinkedIn,Social Media
+Professional Networking,Others,Social Media
+Instagram,Social Media,General Social Media
+Facebook,Social Media,General Social Media
+Twitter,Social Media,General Social Media
+Tiktok,Social Media,General Social Media
+Others,Social Media,General Social Media
+Movies & Series Streaming,Netflix,Entertainment & Leisure
+Movies & Series Streaming,Hulu,Entertainment & Leisure
+Movies & Series Streaming,Disney+,Entertainment & Leisure
+Movies & Series Streaming,Youtube,Entertainment & Leisure
+Gaming & Related Platforms,Steam,Entertainment & Leisure
+Free Fire,Gaming & Related Platforms,Entertainment & Leisure
+Gaming & Related Platforms,Twitch,Entertainment & Leisure
+Gaming & Related Platforms,Others,Entertainment & Leisure
+Lifestyle & Blogs,Personal blogs,Entertainment & Leisure
+Lifestyle & Blogs,Lifestyle magazines online,Entertainment & Leisure
+Lifestyle & Blogs,Others,Entertainment & Leisure
+Calculators & Converters,Utilities & Miscellaneous,Utilities & Miscellaneous
+Translation & Language Tools,Utilities & Miscellaneous,Utilities & Miscellaneous
+Cloud Storage,Google Drive,Utilities & Miscellaneous
+Cloud Storage,Dropbox,Utilities & Miscellaneous
+Cloud Storage,iCloud,Utilities & Miscellaneous
+Cloud Storage,Others,Utilities & Miscellaneous
+Amazon,Shopping & E-commerce,Shopping & E-commerce
+eBay,Shopping & E-commerce,Shopping & E-commerce
+Flipkart,Shopping & E-commerce,Shopping & E-commerce
+Etsy,Shopping & E-commerce,Shopping & E-commerce
+Myntra,Shopping & E-commerce,Shopping & E-commerce
+Others,Shopping & E-commerce,Shopping & E-commerce
+Sports News & Updates,Sports & Recreation,Sports & Recreation
+Live Streaming & Highlights,Sports & Recreation,Sports & Recreation
+Others,Sports & Recreation,Sports & Recreation
+Explicit Content Sites,Sensitive & Restricted,Sensitive & Restricted
+Dating & Relationship Platforms,Sensitive & Restricted,Sensitive & Restricted
+Gambling & Betting,Sensitive & Restricted,Sensitive & Restricted
+Online Casinos,Gambling & Betting,Sensitive & Restricted
+Sports Betting Platforms,Gambling & Betting,Sensitive & Restricted
+Others,Gambling & Betting,Sensitive & Restricted
+Academic Tutorials & Lectures,Video Platforms,Educational & Informative
+Tech & Software Tutorials,Video Platforms,Educational & Informative
+DIYs & How-Tos,Video Platforms,Educational & Informative
+Language Learning,Video Platforms,Educational & Informative
+Professional Workshops & Webinars,Video Platforms,Educational & Informative
+Documentaries & Long-form Informational,Video Platforms,Educational & Informative
+Research Presentations & Conference Talks,Video Platforms,Educational & Informative
+Product & Software Reviews,Video Platforms,Professional & Industry-Specific
+Industry News & Updates,Video Platforms,Professional & Industry-Specific
+Professional Interviews & Panel Discussions,Video Platforms,Professional & Industry-Specific
+Corporate Presentations & Releases,Video Platforms,Professional & Industry-Specific
+Music Videos & Concerts,Video Platforms,Entertainment
+Movies,TV Show Clips & Trailers,Video Platforms
+Stand-up Comedy & Comedy Sketches,Video Platforms,Entertainment
+Animation & Animated Series,Video Platforms,Entertainment
+Reality Shows & Talent Competitions,Video Platforms,Entertainment
+Vlogs & Personal Stories,Video Platforms,Lifestyle
+Travel & Adventure Logs,Video Platforms,Lifestyle
+Cooking & Culinary Shows,Video Platforms,Lifestyle
+Art & Craft Tutorials,Video Platforms,Lifestyle
+Dance & Choreography,Video Platforms,Lifestyle
+Gameplays & Walkthroughs,Video Platforms,Gaming
+Game Reviews & Analysis,Video Platforms,Gaming
+Live Streaming & Esports,Video Platforms,Gaming
+Game Development & Tutorials,Video Platforms,Gaming
+Sports Highlights & Recaps,Video Platforms,Sports & Fitness
+Live Sports Streaming,Video Platforms,Sports & Fitness
+Fitness & Workout Tutorials,Video Platforms,Sports & Fitness
+Sports Analysis & Commentary,Video Platforms,Sports & Fitness
+Gadget Unboxings & Reviews,Video Platforms,Tech & Gadgets
+Tech News & Updates,Video Platforms,Tech & Gadgets
+Coding & Programming Streams,Video Platforms,Tech & Gadgets
+Tech Event Coverage & Launches,Video Platforms,Tech & Gadgets
+Children’s Songs & Rhymes,Video Platforms,Children & Family
+Animated Stories & Shows,Video Platforms,Children & Family
+DIY Crafts for Kids,Video Platforms,Children & Family
+Educational Content for Kids,Video Platforms,Children & Family
+Sociopolitical Commentaries & Debates,Video Platforms,Culture & Society
+Cultural Shows & Traditional Arts,Video Platforms,Culture & Society
+Religious & Spiritual Content,Video Platforms,Culture & Society
+Social Issues & Activism,Video Platforms,Culture & Society
+Unboxing & Hauls,Video Platforms,Miscellaneous
+ASMR & Relaxation,Video Platforms,Miscellaneous
+Pets & Animals Content,Video Platforms,Miscellaneous
+Challenges & Viral Trends,Video Platforms,Miscellaneous
+Memes & Parodies,Video Platforms,Miscellaneous
+Others,Video Platforms,Miscellaneous
