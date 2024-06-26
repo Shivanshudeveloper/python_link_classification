@@ -101,17 +101,22 @@ productivity_map = {
 }
 
 # Load machine learning models
-label_encoder = joblib.load('label_encoder.joblib')
-vectorizer = joblib.load('tfif_vectorizer.joblib')
-model = joblib.load('website_classifier_model.joblib')
+try:
+    label_encoder = joblib.load('label_encoder.joblib')
+    vectorizer = joblib.load('tfif_vectorizer.joblib')
+    model = joblib.load('website_classifier_model.joblib')
+except Exception as e:
+    print(f"Error loading models: {e}")
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for the Flask app
 
-# Database configuration
-engine = create_engine(f'mysql+mysqlconnector://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("DB_NAME")}')
-Session = sessionmaker(bind=engine)
+try:
+    engine = create_engine(f'mysql+mysqlconnector://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("DB_NAME")}')
+    Session = sessionmaker(bind=engine)
+except Exception as e:
+    print(f"Error connecting to database: {e}")
 
 def get_all_device_ids():
     session = Session()
@@ -136,14 +141,18 @@ def get_user_activities(device_uid):
         session.close()
 
 def predict_category(title):
-    transformed = vectorizer.transform([title])
-    prediction = model.predict(transformed)
-    category = label_encoder.inverse_transform(prediction)[0]
-    return category
+    try:
+        transformed = vectorizer.transform([title])
+        prediction = model.predict(transformed)
+        category = label_encoder.inverse_transform(prediction)[0]
+        return category
+    except Exception as e:
+        print(f"Error predicting category: {e}")
+        return "Unknown"
 
 def calculate_productivity_internal(activities):
     productivity_counts = {'Productive': 0, 'Neutral': 0, 'Unproductive': 0, 'Away': 0}
-    total_time = timedelta(hours=1)  # Total duration is fixed as one hour
+    total_time = timedelta(hours=1)
 
     hourly_activities = {}
     for url, timestamp in activities:
@@ -182,6 +191,7 @@ def calculate_productivity_internal(activities):
 
     return hourly_productivity
 
+    
 def calculate_working_hours(activities):
     if not activities:
         return "0h 0m"
