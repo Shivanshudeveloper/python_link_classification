@@ -1,5 +1,5 @@
-from flask import Flask, jsonify
-from flask_cors import CORS  # Import CORS
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
@@ -101,22 +101,17 @@ productivity_map = {
 }
 
 # Load machine learning models
-try:
-    label_encoder = joblib.load('label_encoder.joblib')
-    vectorizer = joblib.load('tfif_vectorizer.joblib')
-    model = joblib.load('website_classifier_model.joblib')
-except Exception as e:
-    print(f"Error loading models: {e}")
+label_encoder = joblib.load('label_encoder.joblib')
+vectorizer = joblib.load('tfif_vectorizer.joblib')
+model = joblib.load('website_classifier_model.joblib')
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for the Flask app
+CORS(app)
 
-try:
-    engine = create_engine(f'mysql+mysqlconnector://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("DB_NAME")}')
-    Session = sessionmaker(bind=engine)
-except Exception as e:
-    print(f"Error connecting to database: {e}")
+# Database configuration
+engine = create_engine(f'mysql+mysqlconnector://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("DB_NAME")}')
+Session = sessionmaker(bind=engine)
 
 def get_all_device_ids():
     session = Session()
@@ -129,10 +124,12 @@ def get_all_device_ids():
     finally:
         session.close()
 
-def get_user_activities(device_uid):
+def get_user_activities(device_uid, date):
     session = Session()
     try:
-        result = session.execute(text("SELECT url, timestamp FROM user_activity WHERE user_uid = :device_uid ORDER BY timestamp"), {"device_uid": device_uid}).fetchall()
+        result = session.execute(text(
+            "SELECT app_name, timestamp FROM user_activity WHERE DATE(timestamp) = :date AND user_uid = :device_uid ORDER BY timestamp"
+        ), {"date": date, "device_uid": device_uid}).fetchall()
         activities = [(row[0], row[1]) for row in result]
         return activities
     except Exception as e:
@@ -140,26 +137,22 @@ def get_user_activities(device_uid):
     finally:
         session.close()
 
-def predict_category(title):
-    try:
-        transformed = vectorizer.transform([title])
-        prediction = model.predict(transformed)
-        category = label_encoder.inverse_transform(prediction)[0]
-        return category
-    except Exception as e:
-        print(f"Error predicting category: {e}")
-        return "Unknown"
+def predict_category(app_name):
+    transformed = vectorizer.transform([app_name])
+    prediction = model.predict(transformed)
+    category = label_encoder.inverse_transform(prediction)[0]
+    return category
 
 def calculate_productivity_internal(activities):
     productivity_counts = {'Productive': 0, 'Neutral': 0, 'Unproductive': 0, 'Away': 0}
     total_time = timedelta(hours=1)
 
     hourly_activities = {}
-    for url, timestamp in activities:
+    for app_name, timestamp in activities:
         hour_key = timestamp.replace(minute=0, second=0, microsecond=0)
         if hour_key not in hourly_activities:
             hourly_activities[hour_key] = []
-        hourly_activities[hour_key].append((url, timestamp))
+        hourly_activities[hour_key].append((app_name, timestamp))
 
     hourly_productivity = {}
     for hour, activities in hourly_activities.items():
@@ -171,9 +164,9 @@ def calculate_productivity_internal(activities):
         away_time = total_time - active_time
         hourly_counts = {'Productive': 0, 'Neutral': 0, 'Unproductive': 0}
 
-        for url, _ in activities:
-            category = predict_category(url)
-            status = productivity_map.get(category, 'Unknown')
+        for app_name, _ in activities:
+            category = predict_category(app_name)
+            status = productivity_map.get(category, 'Neutral')  # Default to 'Neutral' if the category is unknown
             hourly_counts[status] += 1
 
         total_activities = sum(hourly_counts.values())
@@ -182,7 +175,8 @@ def calculate_productivity_internal(activities):
         neutral_percentage = (hourly_counts['Neutral'] / total_activities) * 100 if total_activities else 0
         away_percentage = (away_time / total_time) * 100
 
-        hourly_productivity[hour] = {
+        # Convert datetime key to string for JSON serialization
+        hourly_productivity[hour.strftime('%Y-%m-%d %H:%M:%S')] = {
             'productive_percentage': round(productive_percentage, 2),
             'unproductive_percentage': round(unproductive_percentage, 2),
             'neutral_percentage': round(neutral_percentage, 2),
@@ -191,7 +185,6 @@ def calculate_productivity_internal(activities):
 
     return hourly_productivity
 
-    
 def calculate_working_hours(activities):
     if not activities:
         return "0h 0m"
@@ -204,30 +197,23 @@ def calculate_working_hours(activities):
 
 @app.route('/calculate_hourly_productivity', methods=['GET'])
 def calculate_hourly_productivity():
+    date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
     devices = get_all_device_ids()
     all_productivity_data = []
 
     for device in devices:
         device_id = device['device_uid']
         user_name = device['user_name']
-        activities = get_user_activities(device_id)
+        activities = get_user_activities(device_id, date)
         productivity_data = calculate_productivity_internal(activities)
         working_hours = calculate_working_hours(activities)
 
-        productivity_record = []
-        for hour, data in productivity_data.items():
-            hour_record = [
-                {'productivity': 'core productive', 'percent': data['productive_percentage']},
-                {'productivity': 'unproductive', 'percent': data['unproductive_percentage']},
-                {'productivity': 'neutral', 'percent': data['neutral_percentage']},
-                {'productivity': 'away', 'percent': data['away_percentage']}
-            ]
-            productivity_record.append(hour_record)
-
         all_productivity_data.append({
-            'name': user_name,
-            'workingHour': working_hours,
-            'productivityRecord': productivity_record
+            'date': date,
+            'device_id': device_id,
+            'productivity_data': productivity_data,
+            'user_name': user_name,
+            'working_hours': working_hours
         })
 
     return jsonify(all_productivity_data)
