@@ -128,7 +128,7 @@ def get_user_activities(device_uid, date):
     session = Session()
     try:
         result = session.execute(text(
-            "SELECT app_name, timestamp FROM user_activity WHERE DATE(timestamp) = :date AND user_uid = :device_uid ORDER BY timestamp"
+            "SELECT page_title, timestamp FROM user_activity WHERE DATE(timestamp) = :date AND user_uid = :device_uid ORDER BY timestamp"
         ), {"date": date, "device_uid": device_uid}).fetchall()
         activities = [(row[0], row[1]) for row in result]
         return activities
@@ -137,8 +137,8 @@ def get_user_activities(device_uid, date):
     finally:
         session.close()
 
-def predict_category(app_name):
-    transformed = vectorizer.transform([app_name])
+def predict_category(page_title):
+    transformed = vectorizer.transform([page_title])
     prediction = model.predict(transformed)
     category = label_encoder.inverse_transform(prediction)[0]
     return category
@@ -148,11 +148,11 @@ def calculate_productivity_internal(activities):
     total_time = timedelta(hours=1)
 
     hourly_activities = {}
-    for app_name, timestamp in activities:
+    for page_title, timestamp in activities:
         hour_key = timestamp.replace(minute=0, second=0, microsecond=0)
         if hour_key not in hourly_activities:
             hourly_activities[hour_key] = []
-        hourly_activities[hour_key].append((app_name, timestamp))
+        hourly_activities[hour_key].append((page_title, timestamp))
 
     hourly_productivity = {}
     for hour, activities in hourly_activities.items():
@@ -164,8 +164,8 @@ def calculate_productivity_internal(activities):
         away_time = total_time - active_time
         hourly_counts = {'Productive': 0, 'Neutral': 0, 'Unproductive': 0}
 
-        for app_name, _ in activities:
-            category = predict_category(app_name)
+        for page_title, _ in activities:
+            category = predict_category(page_title)
             status = productivity_map.get(category, 'Neutral')  # Default to 'Neutral' if the category is unknown
             hourly_counts[status] += 1
 
