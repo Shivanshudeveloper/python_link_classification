@@ -1,66 +1,101 @@
-Introduction:
+---
 
-    This Python project is designed to classify websites into different categories and perform word matching between user-provided text and predefined words. It is a Flask-based web application that offers various functionalities including website classification using a Decision Tree classifier, word matching against a CSV file, and storing results in a PostgreSQL database. Below, we provide an overview of the project structure and usage instructions.
+# Rust Desktop Application
 
-Prerequisites:
+Welcome to the Rust Desktop Application! This project showcases a variety of Rust programming techniques and libraries to create a powerful and efficient desktop application. Whether you're a seasoned developer or just starting with Rust, this guide will help you get set up and running quickly.
 
-    Before running the project, make sure you have the following prerequisites installed:
+![Rust Logo](https://www.rust-lang.org/static/images/rust-logo-blk.svg)
 
-        Python 3.x
-        Flask
-        pandas
-        scikit-learn
-        pymongo
-        sqlalchemy
-        dotenv
+## Table of Contents
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-    You can install these packages using pip if they are not already installed.
+## Introduction
+This Rust application monitors system activity, capturing keystrokes and mouse clicks, and interacts with external configurations. It leverages multiple Rust crates such as `tokio`, `serde_json`, `reqwest`, and others to provide robust functionality.
 
-Project Structure:
+## Features
+- **Keystroke and Mouse Click Monitoring:** Efficiently tracks user input.
+- **Periodic Configuration Fetching:** Updates configurations from a remote server at regular intervals.
+- **User Status Handling:** Differentiates between paid and unpaid users with appropriate handling.
+- **Asynchronous Operations:** Utilizes async programming for non-blocking operations.
 
-    app.py: The main Flask application file that contains the web server and routes.
-    
-    website_classification.csv: A CSV file containing predefined words for website categories.
-    
-    model2.pkl: A pre-trained Decision Tree classifier model (for website classification).
-    
-    screenshots/: A directory for storing uploaded images (create this directory manually).
+## Installation
 
-Configuration:
+### Prerequisites
+Ensure you have Rust and Cargo installed. You can install Rust using `rustup`:
 
-    The project uses environment variables to configure various settings. Create a .env file in the project root directory and add the following configuration settings:
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
-        makefile
-        Copy code
-        MONGO_URI=your_mongodb_uri
-        POSTGRES_URI=your_postgresql_uri
-        Replace your_mongodb_uri and your_postgresql_uri with the respective URIs for your MongoDB and PostgreSQL databases.
+### Clone the Repository
+Clone the GitHub repository to your local machine:
 
-Running the Application:
+```sh
+git clone https://github.com/Shivanshudeveloper/rust_desktop.git
+cd rust_desktop
+```
 
-    To run the application, execute the following command in your terminal:
+### Build the Project
+Build the project using Cargo:
 
-        python app.py
-    
-    The Flask web server will start, and you can access the application by navigating to http://localhost:8080 in your web browser.
+```sh
+cargo build
+```
 
-Web Routes:
+## Usage
 
-    /: The home route that displays a welcome message.
-    /mlwork (POST): Accepts JSON data for word matching and website category prediction.
+### Running the Application
+After building the project, you can run the application with:
 
-Word Matching and Category Prediction
+```sh
+cargo run
+```
 
-    The /mlwork route accepts JSON data with the following format:
+### Example Output
+The application will start monitoring keystrokes and mouse clicks, printing updates to the console. It will also periodically fetch configuration updates from the specified server.
 
-        {
-        "userData": ["list", "of", "words"],
-        "userId": "unique_user_id"
-        }
+```sh
+Keystroke detected, count: 1
+Mouse click detected, count: 1
+```
 
-    The provided list of words is matched against predefined words in the website_classification.csv file.
-    Cosine similarity is used to calculate the similarity between words.
-    
-    Results are stored in a PostgreSQL database (img_match table) with the average probability and the highest probability word.
-    
-    Website category prediction is performed using a pre-trained Decision Tree classifier (model2.pkl) based on the user's title. Predicted categories are stored in the data_match table.
+### Configuration
+The application reads its configuration from a `config.txt` file. Ensure this file is present and properly formatted in the root directory.
+
+```json
+{
+  "config": {
+    "isPaid": true,
+    "otherSettings": "value"
+  }
+}
+```
+
+## Contributing
+Contributions are welcome! Feel free to fork this repository, make your changes, and submit a pull request.
+
+### Steps to Contribute
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -am 'Add new feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Create a new Pull Request.
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+Feel free to add any additional details or sections as needed. Adding images and SVGs to your repository can be done by placing them in an `assets` directory and referencing them in your README. For example:
+
+```markdown
+![Exciting Tech Image](assets/tech_image.png)
+```
+
+This will ensure your README file looks professional and engaging, attracting more developers to your project.
