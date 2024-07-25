@@ -9,6 +9,7 @@ import os
 import logging
 import json
 import numpy as np
+import pytz
 
 # Load environment variables
 load_dotenv()
@@ -79,6 +80,32 @@ def get_all_device_ids(organization_uid):
     finally:
         session.close()
 
+def convert_to_z_format(db_timestamp):
+    # Parse the database timestamp
+    dt = datetime.strptime(db_timestamp, '%Y-%m-%d %H:%M:%S')
+    
+    # Convert to UTC time
+    utc_time = pytz.utc.localize(dt)
+    
+    # Convert to 'Z' format
+    z_format_time = utc_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    
+    return z_format_time
+
+def convert_to_local_time(z_format_time, timezone_str='Asia/Kolkata'):
+    # Parse the 'Z' format time
+    utc_time = datetime.strptime(z_format_time, '%Y-%m-%dT%H:%M:%S.%fZ')
+    utc_time = pytz.utc.localize(utc_time)
+    
+    # Convert to the local time zone
+    local_tz = pytz.timezone(timezone_str)
+    local_time = utc_time.astimezone(local_tz)
+    
+    # Format the local time
+    local_time_str = local_time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    return local_time_str
+
 def get_user_activities(device_uid, date):
     logging.info(f"Fetching activities for device UID: {device_uid} on date: {date}...")
     session = Session()
@@ -86,7 +113,23 @@ def get_user_activities(device_uid, date):
         result = session.execute(text(
             "SELECT page_title, timestamp FROM user_activity WHERE DATE(timestamp) = :date AND user_uid = :device_uid ORDER BY timestamp"
         ), {"date": date, "device_uid": device_uid}).fetchall()
-        activities = [(row[0], row[1]) for row in result]
+        
+        activities = []
+        for row in result:
+            page_title = row[0]
+            db_timestamp = row[1].strftime('%Y-%m-%d %H:%M:%S')  # Assuming timestamp is datetime object
+            
+            # Convert database timestamp to 'Z' format
+            z_format_time = convert_to_z_format(db_timestamp)
+            
+            # Convert 'Z' format timestamp to local time format
+            local_time = convert_to_local_time(z_format_time)
+            
+            # Parse local_time back to datetime object for further processing
+            local_time_dt = datetime.strptime(local_time, '%Y-%m-%d %H:%M:%S')
+            
+            activities.append((page_title, local_time_dt))
+        
         return activities
     except Exception as e:
         logging.error(f"Error fetching user activities: {e}")
@@ -214,7 +257,7 @@ def calculate_productivity_internal(activities):
     except Exception as e:
         logging.error(f"Error calculating productivity: {e}")
         return []
-     
+
 def calculate_working_hours(activities):
     try:
         if not activities:
@@ -229,7 +272,6 @@ def calculate_working_hours(activities):
     except Exception as e:
         logging.error(f"Error calculating working hours: {e}")
         return "0h 0m"
-
 @app.route('/calculate_hourly_productivity', methods=['GET'])
 def calculate_hourly_productivity():
     date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
@@ -318,3 +360,5 @@ def map_category():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+#  Only need to change the gap or widths of the data in teh frontend.
