@@ -28,9 +28,10 @@ def load_category_list():
     except Exception as e:
         logging.error(f"Error loading category list: {e}")
     return {
+        "Core Productive": [],  # Added Core Productive
         "Productive": [],
         "Unproductive": [],
-        "Neutral": [],
+        "Idle": [],
         "Others": []
     }
 
@@ -40,8 +41,10 @@ def save_category_list():
     try:
         with open(CATEGORY_LIST_FILE, 'w') as file:
             json.dump(category_list, file, indent=4)
+        logging.info("Category list updated and saved.")
     except Exception as e:
         logging.error(f"Error saving category list: {e}")
+
 
 # Load machine learning models
 try:
@@ -141,47 +144,51 @@ def predict_category(page_title):
     try:
         logging.info(f"Predicting category for page title: {page_title}...")
 
-        # Check if the title matches any keyword in the category list
+        # Match against the category list
         for category, keywords in category_list.items():
             if category == "Others":
                 continue
             for keyword in keywords:
                 if keyword.lower() in page_title.lower():
                     logging.info(f"Matched keyword '{keyword}' in category '{category}'")
-                    return category, 1.0, False  # High confidence if manually matched
+                    return category, 1.0, False  # High confidence for manual matches
 
-        # Use ML model to predict category if no match is found
+        # Use ML model if no match is found
         transformed = vectorizer.transform([page_title])
         prediction = model.predict(transformed)
         confidence = np.max(model.predict_proba(transformed))  # Get the highest confidence score
         category = label_encoder.inverse_transform(prediction)[0]
         logging.info(f"Predicted category: {category} with confidence: {confidence}")
 
-        if confidence < 0.4:
-            if page_title in category_list["Others"]:
-                return "Others", 1.0, True
-            category_list["Others"].append(page_title)
-            save_category_list()
-            category = "Others"
-            confidence = 1.0  # High confidence since we are manually categorizing
+        # Handle low confidence or missing category
+        if confidence < 0.4 or category not in category_list:
+            if page_title not in category_list["Others"]:
+                category_list["Others"].append(page_title)
+                save_category_list()
+            return "Others", 1.0, True  # Assign to 'Others' for ambiguous titles
 
         return category, confidence, False
     except Exception as e:
         logging.error(f"Error predicting category: {e}")
-        return "Others", 0.0, False
+        return "Neutral", 0.0, False
 
 def map_category_to_productivity(category):
+    logging.info(f"Category Maping: {category}")
     try:
-        if category in category_list["Productive"]:
-            return 'core productive'
-        elif category in category_list["Unproductive"]:
-            return 'unproductive'
-        elif category in category_list["Neutral"]:
-            return 'idle'
-        return 'idle'
+        if category in category_list.get("Core Productive", []):
+            return "core productive"
+        elif category in category_list.get("Productive", []):
+            return "productive"
+        elif category in category_list.get("Unproductive", []):
+            return "unproductive"
+        elif category in category_list.get("Idle", []):
+            return "idle"
+        else:
+            logging.warning(f"Category '{category}' not found in category list. Defaulting to 'idle'.")
+            return "idle"  # Default to idle for unknown categories
     except Exception as e:
         logging.error(f"Error mapping category to productivity: {e}")
-        return 'idle'
+        return "idle"
 
 def calculate_productivity_internal(activities):
     try:
@@ -357,6 +364,61 @@ def map_category():
         save_category_list()
 
     return jsonify({"status": "success", "message": "Category mapping updated."})
+
+@app.route('/getUserProductivity/<device_id>', methods=['GET'])
+def get_user_productivity(device_id):
+    # Get the start date from the query parameters
+    start_date_str = request.args.get('from')
+    try:
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+    except Exception as e:
+        logging.error(f"Invalid 'from' date format: {e}")
+        return jsonify({"error": "Invalid 'from' date format. Use YYYY-MM-DD."}), 400
+
+    # Initialize the data format for response
+    response_data = {
+        "Core Productivity": [],
+        "Productivity": [],
+        "Unproductivity": [],
+        "Idle": [],
+        "Away": []
+    }
+
+    # Iterate over the 7-day range
+    for day_offset in range(7):
+        current_date = start_date + timedelta(days=day_offset)
+        activities = get_user_activities(device_id, current_date.strftime('%Y-%m-%d'))
+
+        if activities:
+            hourly_counts = {'core productive': 0, 'productive': 0, 'idle': 0, 'unproductive': 0}
+            total_activities = len(activities)
+
+            for page_title, _ in activities:
+                category, confidence, _ = predict_category(page_title)
+                status = map_category_to_productivity(category)
+                hourly_counts[status] += 1
+
+            core_productive_percentage = (hourly_counts['core productive'] / total_activities) * 100
+            productive_percentage = (hourly_counts['productive'] / total_activities) * 100
+            unproductive_percentage = (hourly_counts['unproductive'] / total_activities) * 100
+            Idle_percentage = (hourly_counts['idle'] / total_activities) * 100
+        else:
+            core_productive_percentage = 0
+            productive_percentage = 0
+            unproductive_percentage = 0
+            Idle_percentage = 0
+
+        away_percentage = 100 - (core_productive_percentage + productive_percentage + unproductive_percentage + Idle_percentage)
+
+        # Append daily percentages to the response
+        response_data["Core Productivity"].append(round(core_productive_percentage, 2))
+        response_data["Productivity"].append(round(productive_percentage, 2))
+        response_data["Unproductivity"].append(round(unproductive_percentage, 2))
+        response_data["Idle"].append(round(Idle_percentage, 2))
+        response_data["Away"].append(round(away_percentage, 2))
+
+    logging.info(f"User productivity data prepared for device_id {device_id}")
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
